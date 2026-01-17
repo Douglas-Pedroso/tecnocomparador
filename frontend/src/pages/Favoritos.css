@@ -1,0 +1,87 @@
+.favoritos-page {
+  min-height: calc(100vh - 70px);
+  padding: 40px 0;
+}
+
+.favoritos-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+  padding: 30px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.header-title {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.header-title h1 {
+  font-size: 32px;
+  font-weight: 800;
+  color: #1f2937;
+  margin: 0;
+}
+
+.heart-icon {
+  font-size: 32px;
+  color: #ef4444;
+}
+
+.count-badge {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.favoritos-header .btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.favoritos-header .btn svg {
+  font-size: 16px;
+}
+
+@media (max-width: 768px) {
+  .favoritos-page {
+    padding: 20px 0;
+  }
+
+  .favoritos-header {
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+  }
+
+  .header-title {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .header-title h1 {
+    font-size: 24px;
+  }
+
+  .heart-icon {
+    font-size: 24px;
+  }
+
+  .count-badge {
+    font-size: 16px;
+    padding: 4px 12px;
+  }
+
+  .favoritos-header .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
