@@ -1,4 +1,5 @@
 const puppeteer = require('puppeteer');
+const chromium = require('@sparticuz/chromium');
 
 /**
  * Scraper com Puppeteer para sites JavaScript
@@ -10,18 +11,31 @@ let browser = null;
 
 async function getBrowser() {
   if (!browser) {
-    browser = await puppeteer.launch({
-      headless: true,
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-accelerated-2d-canvas',
-        '--no-first-run',
-        '--no-zygote',
-        '--disable-gpu'
-      ]
-    });
+    const isProd = process.env.NODE_ENV === 'production';
+    
+    if (isProd) {
+      // Produção (Render) - usar chromium otimizado
+      browser = await puppeteer.launch({
+        args: chromium.args,
+        defaultViewport: chromium.defaultViewport,
+        executablePath: await chromium.executablePath(),
+        headless: chromium.headless
+      });
+    } else {
+      // Desenvolvimento - usar puppeteer normal
+      browser = await puppeteer.launch({
+        headless: true,
+        args: [
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-dev-shm-usage',
+          '--disable-accelerated-2d-canvas',
+          '--no-first-run',
+          '--no-zygote',
+          '--disable-gpu'
+        ]
+      });
+    }
   }
   return browser;
 }
