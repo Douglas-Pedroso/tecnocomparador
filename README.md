@@ -132,6 +132,42 @@ O sistema utiliza **Puppeteer** (Headless Chrome) para fazer scraping em tempo r
 4. Resultados são agregados e retornados ao frontend
 5. Produtos favoritos são salvos automaticamente no banco
 
+### ⚠️ Limitações do Puppeteer em Ambientes Serverless
+
+**Problema:** O Render (plano gratuito) não inclui Chromium por padrão, fazendo o scraping falhar.
+
+**Solução Implementada:**
+- Em **produção**: Usa `@sparticuz/chromium` (Chromium otimizado para serverless)
+- Em **desenvolvimento**: Usa o Puppeteer normal com Chrome local
+
+**Configuração no código:**
+```javascript
+// backend/services/puppeteer-scraper.js
+const isProd = process.env.NODE_ENV === 'production';
+
+if (isProd) {
+  // Chromium otimizado para Render/Lambda
+  browser = await puppeteer.launch({
+    args: chromium.args,
+    executablePath: await chromium.executablePath()
+  });
+} else {
+  // Puppeteer normal para desenvolvimento
+  browser = await puppeteer.launch({ headless: true });
+}
+```
+
+**Dependências necessárias:**
+```bash
+npm install @sparticuz/chromium puppeteer-core
+```
+
+**Alternativas se o scraping continuar lento:**
+- Migrar para plano pago do Render ($7/mês)
+- Usar Railway ou Fly.io (melhor suporte a Puppeteer)
+- Implementar cache de resultados
+- Usar APIs oficiais das lojas (se disponíveis)
+
 ## 📝 Licença
 
 MIT
