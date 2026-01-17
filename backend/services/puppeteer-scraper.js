@@ -1,5 +1,4 @@
 const puppeteer = require('puppeteer');
-const chromium = require('@sparticuz/chromium');
 
 /**
  * Scraper com Puppeteer para sites JavaScript
@@ -13,28 +12,40 @@ async function getBrowser() {
   if (!browser) {
     const isProd = process.env.NODE_ENV === 'production';
     
-    if (isProd) {
-      // Produção (Render) - usar chromium otimizado
-      browser = await puppeteer.launch({
-        args: chromium.args,
-        defaultViewport: chromium.defaultViewport,
-        executablePath: await chromium.executablePath(),
-        headless: chromium.headless
-      });
-    } else {
-      // Desenvolvimento - usar puppeteer normal
-      browser = await puppeteer.launch({
-        headless: true,
-        args: [
-          '--no-sandbox',
-          '--disable-setuid-sandbox',
-          '--disable-dev-shm-usage',
-          '--disable-accelerated-2d-canvas',
-          '--no-first-run',
-          '--no-zygote',
-          '--disable-gpu'
-        ]
-      });
+    try {
+      if (isProd) {
+        // Produção (Render) - usar chromium otimizado
+        const chromium = require('@sparticuz/chromium');
+        
+        console.log('🔧 Iniciando Chromium serverless...');
+        browser = await puppeteer.launch({
+          args: [...chromium.args, '--disable-web-security'],
+          defaultViewport: chromium.defaultViewport,
+          executablePath: await chromium.executablePath(),
+          headless: chromium.headless,
+          ignoreHTTPSErrors: true
+        });
+        console.log('✅ Chromium iniciado com sucesso');
+      } else {
+        // Desenvolvimento - usar puppeteer normal
+        console.log('🔧 Iniciando Puppeteer local...');
+        browser = await puppeteer.launch({
+          headless: true,
+          args: [
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage',
+            '--disable-accelerated-2d-canvas',
+            '--no-first-run',
+            '--no-zygote',
+            '--disable-gpu'
+          ]
+        });
+        console.log('✅ Puppeteer iniciado com sucesso');
+      }
+    } catch (error) {
+      console.error('❌ Erro ao iniciar navegador:', error.message);
+      throw error;
     }
   }
   return browser;
