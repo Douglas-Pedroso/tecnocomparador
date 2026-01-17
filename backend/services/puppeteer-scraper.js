@@ -1,5 +1,3 @@
-const puppeteer = require('puppeteer');
-
 /**
  * Scraper com Puppeteer para sites JavaScript
  * Funciona com Worten, PCDiga e outros sites modernos
@@ -14,11 +12,12 @@ async function getBrowser() {
     
     try {
       if (isProd) {
-        // Produção (Render) - usar chromium otimizado
+        // Produção (Render) - usar chromium otimizado com puppeteer-core
+        const puppeteerCore = require('puppeteer-core');
         const chromium = require('@sparticuz/chromium');
         
         console.log('🔧 Iniciando Chromium serverless...');
-        browser = await puppeteer.launch({
+        browser = await puppeteerCore.launch({
           args: [...chromium.args, '--disable-web-security'],
           defaultViewport: chromium.defaultViewport,
           executablePath: await chromium.executablePath(),
@@ -28,6 +27,7 @@ async function getBrowser() {
         console.log('✅ Chromium iniciado com sucesso');
       } else {
         // Desenvolvimento - usar puppeteer normal
+        const puppeteer = require('puppeteer');
         console.log('🔧 Iniciando Puppeteer local...');
         browser = await puppeteer.launch({
           headless: true,
@@ -45,6 +45,7 @@ async function getBrowser() {
       }
     } catch (error) {
       console.error('❌ Erro ao iniciar navegador:', error.message);
+      console.error('Stack:', error.stack);
       throw error;
     }
   }
