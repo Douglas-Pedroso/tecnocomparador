@@ -8,32 +8,22 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middlewares
-const allowedOrigins = [
-  'http://localhost:3000',
-  'https://tecnocomparador.vercel.app',
-  /^https:\/\/tecnocomparador-[a-z0-9]+-douglas-pedrosos-projects\.vercel\.app$/, // Deployments do Vercel
-  /^https:\/\/tecnocomparador-.*\.vercel\.app$/ // Preview branches do Vercel
-];
-
 app.use(cors({
   origin: function (origin, callback) {
     // Permite requests sem origin (como mobile apps ou curl)
     if (!origin) return callback(null, true);
     
-    // Verifica se a origin é permitida
-    const isAllowed = allowedOrigins.some(allowedOrigin => {
-      if (typeof allowedOrigin === 'string') {
-        return allowedOrigin === origin;
-      }
-      // Se for regex
-      return allowedOrigin.test(origin);
-    });
-    
-    if (isAllowed) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
+    // Aceita localhost para desenvolvimento
+    if (origin.includes('localhost:3000')) {
+      return callback(null, true);
     }
+    
+    // Aceita qualquer domínio .vercel.app
+    if (origin.endsWith('.vercel.app')) {
+      return callback(null, true);
+    }
+    
+    callback(new Error('Not allowed by CORS'));
   },
   credentials: true
 }));
