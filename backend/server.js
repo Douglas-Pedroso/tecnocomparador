@@ -11,7 +11,8 @@ const PORT = process.env.PORT || 5000;
 const allowedOrigins = [
   'http://localhost:3000',
   'https://tecnocomparador.vercel.app',
-  /^https:\/\/tecnocomparador-.*\.vercel\.app$/ // Permite todos os domínios de preview do Vercel
+  /^https:\/\/tecnocomparador-[a-z0-9]+-douglas-pedrosos-projects\.vercel\.app$/, // Deployments do Vercel
+  /^https:\/\/tecnocomparador-.*\.vercel\.app$/ // Preview branches do Vercel
 ];
 
 app.use(cors({
