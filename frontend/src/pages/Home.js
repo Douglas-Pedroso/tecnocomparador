@@ -144,17 +144,17 @@ function Home() {
                 <div style={{textAlign: 'center', padding: '20px'}}>
                   <div style={{fontSize: '3rem', marginBottom: '10px'}}>💰</div>
                   <h3>Economize Tempo e Dinheiro</h3>
-                  <p style={{color: 'rgba(255, 255, 255, 0.85)'}}>Visite 5 lojas em segundos em vez de horas navegando manualmente</p>
+                  <p style={{color: 'rgba(255, 255, 255, 0.85)'}}>Visite 6 lojas em segundos em vez de horas navegando manualmente</p>
                 </div>
                 <div style={{textAlign: 'center', padding: '20px'}}>
                   <div style={{fontSize: '3rem', marginBottom: '10px'}}>🏪</div>
-                  <h3>Principais Lojas Portuguesas</h3>
+                  <h3>Lojas em Portugal</h3>
                   <p style={{color: 'rgba(255, 255, 255, 0.85)'}}>Worten, Radio Popular, PCDiga, PCBem, Chip7 e GlobalData com entrega em Portugal</p>
                 </div>
                 <div style={{textAlign: 'center', padding: '20px'}}>
                   <div style={{fontSize: '3rem', marginBottom: '10px'}}>⚡</div>
-                  <h3>Resultados em Tempo Real</h3>
-                  <p style={{color: 'rgba(255, 255, 255, 0.85)'}}>Preços e disponibilidade atualizados diretamente dos sites das lojas</p>
+                  <h3>Resultados Rápidos</h3>
+                  <p style={{color: 'rgba(255, 255, 255, 0.85)'}}>Consulta instantânea na nossa base de dados com preços das lojas</p>
                 </div>
                 <div style={{textAlign: 'center', padding: '20px'}}>
                   <div style={{fontSize: '3rem', marginBottom: '10px'}}>📊</div>
