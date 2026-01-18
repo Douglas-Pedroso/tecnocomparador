@@ -99,6 +99,7 @@ router.post('/buscar-lojas', async (req, res) => {
        ORDER BY loja, preco ASC`,
       [`%${termo}%`]
     );
+    console.log(`📊 Produtos encontrados no banco: ${produtos.rows.length}`);
 
     // Agrupar produtos por loja
     const resultados = {};
