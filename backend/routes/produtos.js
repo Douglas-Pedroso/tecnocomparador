@@ -65,7 +65,7 @@ const salvarProdutos = async (produtos) => {
   return produtosSalvos;
 };
 
-// POST /api/produtos/buscar-lojas - Buscar produtos agrupados por loja
+// POST /api/produtos/buscar-lojas - Buscar produtos agrupados por loja (DO BANCO)
 router.post('/buscar-lojas', async (req, res) => {
   try {
     const { termo } = req.body;
@@ -90,21 +90,64 @@ router.post('/buscar-lojas', async (req, res) => {
       }
     }
 
-    // Scraping real com Puppeteer (sites JavaScript)
-    console.log(`🔍 Buscando "${termo}" nas lojas...`);
-    let resultados = await buscarComPuppeteer(termo);
-    
-    // Se Puppeteer não encontrou nada, usar dados mock como fallback
-    if (Object.keys(resultados).length === 0) {
-      console.log('⚠️ Nenhum resultado real, usando dados de demonstração');
-      resultados = gerarDadosMock(termo);
-    }
+    // BUSCAR DO BANCO (produtos já salvos pelo script scrape-and-save.js)
+    console.log(`🔍 Buscando "${termo}" no banco de dados...`);
+    const produtos = await db.query(
+      `SELECT * FROM produtos 
+       WHERE LOWER(nome) LIKE LOWER($1)
+       AND atualizado_em > NOW() - INTERVAL '7 days'
+       ORDER BY loja, preco ASC`,
+      [`%${termo}%`]
+    );
 
-    // Salvar produtos no banco
+    // Agrupar produtos por loja
+    const resultados = {};
     const lojas = [];
-    for (const [lojaId, dados] of Object.entries(resultados)) {
-      if (dados.produtos && dados.produtos.length > 0) {
-        await salvarProdutos(dados.produtos);
+
+    produtos.rows.forEach(produto => {
+      const lojaId = produto.loja.toLowerCase().replace(/\s+/g, '-');
+      
+      if (!resultados[lojaId]) {
+        resultados[lojaId] = {
+          loja: produto.loja,
+          quantidade: 0,
+          produtos: []
+        };
+        lojas.push({
+          id: lojaId,
+          nome: produto.loja,
+          quantidade: 0
+        });
+      }
+
+      resultados[lojaId].produtos.push({
+        id: produto.id,
+        id_externo: produto.produto_id_externo,
+        nome: produto.nome,
+        preco: parseFloat(produto.preco),
+        preco_original: produto.preco_original ? parseFloat(produto.preco_original) : null,
+        url: produto.url,
+        imagem: produto.imagem,
+        loja: produto.loja,
+        condicao: produto.condicao,
+        disponibilidade: produto.disponibilidade,
+        vendedor: produto.vendedor
+      });
+
+      resultados[lojaId].quantidade++;
+      const lojaIndex = lojas.findIndex(l => l.id === lojaId);
+      if (lojaIndex >= 0) lojas[lojaIndex].quantidade++;
+    });
+
+    // Se não encontrou nada no banco, usar dados mock
+    let usandoMock = false;
+    if (produtos.rows.length === 0) {
+      console.log('⚠️ Nenhum produto no banco, usando dados de demonstração');
+      const mockResultados = gerarDadosMock(termo);
+      usandoMock = true;
+      
+      for (const [lojaId, dados] of Object.entries(mockResultados)) {
+        resultados[lojaId] = dados;
         lojas.push({
           id: lojaId,
           nome: dados.loja,
@@ -116,7 +159,10 @@ router.post('/buscar-lojas', async (req, res) => {
     res.json({
       termo,
       lojas,
-      resultados
+      resultados,
+      total: produtos.rows.length,
+      usandoMock,
+      ultimaAtualizacao: produtos.rows.length > 0 ? produtos.rows[0].atualizado_em : null
     });
   } catch (err) {
     console.error('Erro ao buscar por lojas:', err);
