@@ -6,16 +6,28 @@ Este script permite atualizar a base de dados automaticamente sem fazer scraping
 
 ### 1️⃣ Executar manualmente
 
+**Atualizar uma categoria específica:**
 ```bash
 cd backend
-node scrape-and-save.js
+node scrape-and-save.js "notebook"
+node scrape-and-save.js "telemóvel"
+node scrape-and-save.js "televisão"
 ```
 
-Você pode passar um termo de busca diferente:
+**Atualizar TODAS as categorias de uma vez (recomendado):**
 ```bash
-node scrape-and-save.js "telemóvel"
-node scrape-and-save.js "tablet"
+cd backend
+node atualizar-todas-categorias.js
 ```
+
+Este script atualiza 14 categorias automaticamente:
+- Notebooks, Portáteis, Computadores
+- Telemóveis, Smartphones, Tablets
+- Televisões, Monitores
+- Teclados, Ratos, Impressoras
+- Câmaras, Headphones, Colunas
+
+**Tempo:** ~30-40 minutos para todas as categorias
 
 ### 2️⃣ Agendar execução automática (Windows)
 
@@ -44,22 +56,29 @@ Execute: `powershell -ExecutionPolicy Bypass -File agendar-atualizacao.ps1`
 
 ### 3️⃣ Múltiplos termos de busca
 
-Crie um script `atualizar-tudo.js`:
+**Opção A: Script completo (14 categorias)**
+```bash
+node atualizar-todas-categorias.js
+```
+
+**Opção B: Script customizado**
+
+Crie um script `atualizar-customizado.js`:
 
 ```javascript
 const { execSync } = require('child_process');
 
-const termos = ['notebook', 'telemóvel', 'tablet', 'monitor', 'rato', 'teclado'];
+const categorias = ['notebook', 'telemóvel', 'tablet', 'monitor'];
 
-for (const termo of termos) {
-  console.log(`\n🔄 Atualizando: ${termo}`);
-  execSync(`node scrape-and-save.js "${termo}"`, { stdio: 'inherit' });
+for (const categoria of categorias) {
+  console.log(`\n🔄 Atualizando: ${categoria}`);
+  execSync(`node scrape-and-save.js "${categoria}"`, { stdio: 'inherit' });
 }
 
 console.log('\n✅ Todas as atualizações concluídas!');
 ```
 
-Execute: `node atualizar-tudo.js`
+Execute: `node atualizar-customizado.js`
 
 ## 📊 Como funciona
 
