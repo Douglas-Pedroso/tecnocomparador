@@ -52,10 +52,37 @@ function Home() {
             Compare preços de <span className="highlight">tecnologia</span> em <span style={{color: '#ef4444', textShadow: '0 0 2px #22c55e, 0 0 4px #22c55e, -1px -1px 0 #22c55e, 1px -1px 0 #22c55e, -1px 1px 0 #22c55e, 1px 1px 0 #22c55e'}}>Portugal</span>
           </h1>
           <p className="hero-subtitle">
-            Pesquise em 6 lojas portuguesas simultaneamente e encontre o melhor preço.<br/>
+            Pesquise produtos em lojas dentro de Portugal e encontre o melhor preço.<br/>
             <strong>Worten, Radio Popular, PCDiga, PCBem, Chip7 e GlobalData</strong> - Tudo num só lugar!
           </p>
           <SearchBar onSearch={handleBusca} loading={loading} />
+          
+          {/* Categorias Populares */}
+          <div className="categorias-populares">
+            <p className="categorias-label">🔥 Categorias Populares:</p>
+            <div className="categorias-grid">
+              <button className="categoria-chip" onClick={() => handleBusca('portátil')}>💻 Portáteis</button>
+              <button className="categoria-chip" onClick={() => handleBusca('smartphone')}>📱 Smartphones</button>
+              <button className="categoria-chip" onClick={() => handleBusca('iphone')}>📱 iPhone</button>
+              <button className="categoria-chip" onClick={() => handleBusca('samsung')}>📱 Samsung</button>
+              <button className="categoria-chip" onClick={() => handleBusca('xiaomi')}>📱 Xiaomi</button>
+              <button className="categoria-chip" onClick={() => handleBusca('televisão')}>📺 Televisões</button>
+              <button className="categoria-chip" onClick={() => handleBusca('tablet')}>📲 Tablets</button>
+              <button className="categoria-chip" onClick={() => handleBusca('smartwatch')}>⌚ Smartwatches</button>
+              <button className="categoria-chip" onClick={() => handleBusca('headphones')}>🎧 Headphones</button>
+              <button className="categoria-chip" onClick={() => handleBusca('teclado')}>⌨️ Teclados</button>
+              <button className="categoria-chip" onClick={() => handleBusca('rato')}>🖱️ Ratos</button>
+              <button className="categoria-chip" onClick={() => handleBusca('monitor')}>🖥️ Monitores</button>
+              <button className="categoria-chip" onClick={() => handleBusca('impressora')}>🖨️ Impressoras</button>
+              <button className="categoria-chip" onClick={() => handleBusca('frigorífico')}>❄️ Frigoríficos</button>
+              <button className="categoria-chip" onClick={() => handleBusca('máquina lavar')}>🧺 Máquinas Lavar</button>
+              <button className="categoria-chip" onClick={() => handleBusca('aspirador')}>🧹 Aspiradores</button>
+              <button className="categoria-chip" onClick={() => handleBusca('câmara')}>📷 Câmaras</button>
+              <button className="categoria-chip" onClick={() => handleBusca('consola')}>🎮 Consolas</button>
+              <button className="categoria-chip" onClick={() => handleBusca('SSD')}>💾 SSDs</button>
+              <button className="categoria-chip" onClick={() => handleBusca('powerbank')}>🔋 Powerbanks</button>
+            </div>
+          </div>
         </div>
       </div>
 

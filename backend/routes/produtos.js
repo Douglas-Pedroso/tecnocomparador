@@ -92,12 +92,19 @@ router.post('/buscar-lojas', async (req, res) => {
 
     // BUSCAR DO BANCO (produtos já salvos pelo script scrape-and-save.js)
     console.log(`🔍 Buscando "${termo}" no banco de dados...`);
+    
+    // Remover plurais comuns em português para melhorar busca
+    let termoSingular = termo;
+    if (termo.endsWith('s') && termo.length > 3) {
+      termoSingular = termo.slice(0, -1); // Remove 's' final
+    }
+    
     const produtos = await db.query(
       `SELECT * FROM produtos 
-       WHERE LOWER(nome) LIKE LOWER($1)
+       WHERE (LOWER(nome) LIKE LOWER($1) OR LOWER(nome) LIKE LOWER($2))
        AND atualizado_em > NOW() - INTERVAL '7 days'
        ORDER BY loja, preco ASC`,
-      [`%${termo}%`]
+      [`%${termo}%`, `%${termoSingular}%`]
     );
     console.log(`📊 Produtos encontrados no banco: ${produtos.rows.length}`);
 

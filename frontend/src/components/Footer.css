@@ -1,0 +1,20 @@
+.footer {
+  background: rgba(17, 24, 39, 0.95);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(251, 191, 36, 0.2);
+  padding: 20px;
+  margin-top: 60px;
+  text-align: center;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.footer-content p {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 14px;
+  margin: 0;
+  font-weight: 500;
+}

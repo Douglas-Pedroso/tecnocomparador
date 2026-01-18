@@ -136,6 +136,8 @@ async function atualizarCategorias() {
     'computador',
     'desktop',
     'all-in-one',
+    'mini PC',
+    'chromebook',
     
     // Componentes de PC
     'processador',
@@ -148,6 +150,8 @@ async function atualizarCategorias() {
     'caixa PC',
     'cooler',
     'ventoinha',
+    'placa som',
+    'placa rede',
     
     // Telemóveis e Tablets
     'telemóvel',
@@ -156,6 +160,8 @@ async function atualizarCategorias() {
     'ipad',
     'iphone',
     'samsung galaxy',
+    'xiaomi',
+    'huawei',
     
     // Televisões e Monitores
     'televisão',
@@ -164,10 +170,12 @@ async function atualizarCategorias() {
     'monitor',
     'monitor gaming',
     'projetor',
+    'ecrã portátil',
     
     // Periféricos PC
     'teclado',
     'rato',
+    'mousepad',
     'webcam',
     'microfone',
     'headset',
@@ -179,6 +187,8 @@ async function atualizarCategorias() {
     'pen drive',
     'hub USB',
     'adaptador',
+    'docking station',
+    'KVM switch',
     
     // Impressoras e Scanners
     'impressora',
@@ -186,6 +196,7 @@ async function atualizarCategorias() {
     'scanner',
     'tinta impressora',
     'toner',
+    'papel fotográfico',
     
     // Fotografia e Vídeo
     'câmara',
@@ -196,6 +207,9 @@ async function atualizarCategorias() {
     'gimbal',
     'tripé',
     'cartão memória',
+    'ring light',
+    'softbox',
+    'microfone lapela',
     
     // Gaming
     'consola',
@@ -207,6 +221,9 @@ async function atualizarCategorias() {
     'joystick',
     'volante gaming',
     'cadeira gaming',
+    'secretária gaming',
+    'tapete gaming',
+    'videojogo',
     
     // Networking
     'router',
@@ -214,12 +231,16 @@ async function atualizarCategorias() {
     'repetidor wifi',
     'access point',
     'powerline',
+    'modem',
+    'câmara IP',
     
     // Smartwatches e Wearables
     'smartwatch',
     'smartband',
     'relógio inteligente',
     'pulseira atividade',
+    'apple watch',
+    'samsung watch',
     
     // Acessórios Mobile
     'powerbank',
@@ -228,19 +249,25 @@ async function atualizarCategorias() {
     'capa telemóvel',
     'película',
     'suporte carro',
+    'carregador wireless',
+    'carregador portátil',
     
     // Armazenamento
     'disco externo',
     'NAS',
     'pen USB',
     'cartão SD',
+    'leitor cartões',
     
     // Áudio
     'earbuds',
     'airpods',
     'coluna portátil',
     'amplificador',
-    'leitor CD',
+    'gira-discos',
+    'toca-discos',
+    'microfone estúdio',
+    'interface áudio',
     
     // Eletrodomésticos Grandes
     'frigorífico',
@@ -251,14 +278,20 @@ async function atualizarCategorias() {
     'micro-ondas',
     'exaustor',
     'arca congeladora',
+    'combinado',
+    'placa indução',
     
     // Climatização
     'ar condicionado',
     'aquecedor',
     'desumidificador',
     'purificador ar',
+    'humidificador',
+    'ventoinha',
+    'ventilador',
+    'climatizador',
     
-    // Pequenos Eletrodomésticos
+    // Pequenos Eletrodomésticos Cozinha
     'aspirador',
     'robot aspirador',
     'ferro engomar',
@@ -269,6 +302,27 @@ async function atualizarCategorias() {
     'chaleira',
     'fritadeira ar',
     'processador alimentos',
+    'robot cozinha',
+    'varinha mágica',
+    'picadora',
+    'sanduicheira',
+    'grelhador',
+    'máquina café',
+    'espremedor',
+    'centrifugadora',
+    
+    // Cuidado Pessoal
+    'máquina barbear',
+    'depiladora',
+    'secador cabelo',
+    'escova alisadora',
+    'prancha cabelo',
+    'escova dentes elétrica',
+    'irrigador oral',
+    'balança',
+    'tensiómetro',
+    'termómetro',
+    'oxímetro',
     
     // Casa Inteligente
     'coluna inteligente',
@@ -280,6 +334,17 @@ async function atualizarCategorias() {
     'fechadura inteligente',
     'campainha vídeo',
     'câmara vigilância',
+    'sensor movimento',
+    'detetor fumo',
+    'alarme',
+    
+    // Iluminação
+    'candeeiro',
+    'lâmpada LED',
+    'foco',
+    'projetor LED',
+    'tira LED',
+    'luz noturna',
     
     // Escritório
     'cadeira escritório',
@@ -287,7 +352,77 @@ async function atualizarCategorias() {
     'mesa digitalizadora',
     'calculadora',
     'destruidor papel',
-    'plastificadora'
+    'plastificadora',
+    'encadernadora',
+    'etiquetadora',
+    'quadro branco',
+    
+    // Mobilidade Elétrica
+    'trotinete elétrica',
+    'bicicleta elétrica',
+    'hoverboard',
+    'monociclo elétrico',
+    'patins elétricos',
+    
+    // Automoção
+    'GPS auto',
+    'dashcam',
+    'aspirador carro',
+    'carregador carro',
+    'transmissor FM',
+    'suporte telemóvel carro',
+    
+    // Bebés e Crianças
+    'monitor bebé',
+    'termómetro bebé',
+    'esterilizador',
+    'humidificador bebé',
+    
+    // Desporto e Fitness
+    'smartwatch desporto',
+    'auriculares desporto',
+    'coluna prova água',
+    'ciclocomputador',
+    'pulsómetro',
+    
+    // Telefonia Fixa
+    'telefone fixo',
+    'telefone sem fios',
+    'atendedor',
+    'intercomunicador',
+    
+    // Entretenimento
+    'leitor blu-ray',
+    'leitor DVD',
+    'barra som',
+    'karaoke',
+    'rádio',
+    'despertador',
+    
+    // Cabos e Acessórios
+    'cabo HDMI',
+    'cabo USB-C',
+    'cabo ethernet',
+    'extensão',
+    'régua',
+    'UPS',
+    'estabilizador',
+    
+    // Software e Jogos
+    'windows',
+    'office',
+    'antivírus',
+    'jogo PC',
+    'jogo PS5',
+    'jogo xbox',
+    'jogo switch',
+    
+    // Bolsas e Proteção
+    'mochila portátil',
+    'mala portátil',
+    'bolsa tablet',
+    'capa portátil',
+    'suporte portátil'
   ];
 
   let totalGeralSalvos = 0;

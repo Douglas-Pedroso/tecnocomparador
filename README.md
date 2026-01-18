@@ -1,6 +1,8 @@
 # 🛒 Tecnocomparador
 
-Comparador de preços de produtos de tecnologia em lojas portuguesas. O sistema faz web scraping em tempo real em 6 lojas diferentes para encontrar os melhores preços.
+Comparador de preços de produtos de tecnologia em lojas dentro de Portugal. O sistema utiliza web scraping com cache inteligente em 6 lojas diferentes para encontrar os melhores preços.
+
+**Desenvolvido por Douglas Pedroso © 2026**
 
 ## 🏪 Lojas Suportadas
 
@@ -93,15 +95,18 @@ npm run client  # Frontend na porta 3000
 
 ## 📋 Funcionalidades
 
-- ✅ Busca em tempo real com web scraping (Puppeteer)
+- ✅ **20 categorias populares clicáveis** - Acesso rápido a portáteis, smartphones (iPhone, Samsung, Xiaomi), televisões, tablets, e mais
+- ✅ **Busca inteligente** - Reconhece automaticamente plural e singular ("telemóveis" encontra "telemóvel")
+- ✅ Web scraping com cache (Puppeteer + PostgreSQL)
 - ✅ Comparação de preços em 6 lojas portuguesas
 - ✅ Paginação automática (até 5 páginas por loja)
 - ✅ Sistema de favoritos (requer login)
 - ✅ Preços em euros (€)
 - ✅ Exibição de descontos e preços originais
 - ✅ Ordenação por preço e nome
-- ✅ Interface moderna e responsiva
+- ✅ Interface moderna e responsiva com design português
 - ✅ Autenticação com JWT
+- ✅ Footer com créditos do desenvolvedor
 
 ## 🔗 Endpoints API
 
@@ -165,14 +170,21 @@ Em vez de fazer scraping em tempo real no servidor, implementamos:
 
 **Como usar:**
 ```bash
-# Executar manualmente quando quiser atualizar
+# Opção 1: Atualizar categoria específica (3 minutos)
 cd backend
-node scrape-and-save.js "notebook"
-node scrape-and-save.js "telemóvel"
+node scrape-and-save.js "smartphone"
+node scrape-and-save.js "portátil"
 node scrape-and-save.js "tablet"
 
-# Agendar no Windows (Task Scheduler)
+# Opção 2: TOP 20 categorias mais populares (~1 hora, 4K-6K produtos)
+node atualizar-top20.js
+
+# Opção 3: Todas as 235 categorias (~10-12 horas, 35K-45K produtos)
+node atualizar-todas-categorias.js
+
+# Agendar atualizações automáticas no Windows (Task Scheduler)
 # Ver instruções em backend/ATUALIZACAO-AUTOMATICA.md
+# Guia completo: backend/GUIA-ATUALIZACAO.md
 ```
 
 **Vantagens:**
@@ -180,10 +192,32 @@ node scrape-and-save.js "tablet"
 - ✅ Dados reais das lojas
 - ✅ Servidor rápido (só consulta DB)
 - ✅ Pode atualizar quantas vezes quiser
+- ✅ 235 categorias disponíveis
 
 **Desvantagens:**
 - ⚠️ Dados não são em tempo real (atualização manual ou agendada)
 - ⚠️ Precisa rodar script periodicamente
+
+**📂 Categorias Disponíveis (235 no total):**
+- 💻 Computadores: Portáteis, Desktop, All-in-One, Chromebook
+- 🔧 Componentes: Processador, Placa Gráfica, RAM, SSD, Motherboard
+- 📱 Mobile: Smartphone, Tablet, iPhone, Samsung, Xiaomi, Huawei
+- 🖥️ Displays: Televisão, Monitor, Monitor Gaming, Projetor
+- ⌨️ Periféricos: Teclado, Rato, Webcam, Microfone, Headphones
+- 🖨️ Impressão: Impressora, Scanner, Multifunções, Tinta
+- 📷 Fotografia: Câmara, Drone, GoPro, Gimbal, Ring Light
+- 🎮 Gaming: Consola, PS5, Xbox, Nintendo Switch, Cadeira Gaming
+- 📡 Networking: Router, Switch, Repetidor WiFi, Câmara IP
+- ⌚ Wearables: Smartwatch, Apple Watch, Samsung Watch, Smartband
+- 🔋 Acessórios: Powerbank, Cabo USB, Carregador, Pen USB
+- 🎵 Áudio: Earbuds, Airpods, Coluna Bluetooth, Soundbar
+- ❄️ Eletrodomésticos: Frigorífico, Máquina Lavar, Aspirador, Ar Condicionado
+- 🏡 Casa Inteligente: Alexa, Google Home, Lâmpada Inteligente, Tomada
+- 💈 Cuidado Pessoal: Máquina Barbear, Secador, Escova Alisadora
+- 🚗 Automoção: GPS Auto, Dashcam, Aspirador Carro
+- 👶 Bebés: Monitor Bebé, Termómetro, Esterilizador
+- 🏢 Escritório: Cadeira, Secretária, Destruidor Papel, Plastificadora
+- E muito mais... (ver lista completa em backend/GUIA-ATUALIZACAO.md)
 
 **Configuração no código:**
 ```javascript
