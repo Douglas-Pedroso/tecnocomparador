@@ -132,13 +132,58 @@ O sistema utiliza **Puppeteer** (Headless Chrome) para fazer scraping em tempo r
 4. Resultados são agregados e retornados ao frontend
 5. Produtos favoritos são salvos automaticamente no banco
 
-### ⚠️ Limitações do Puppeteer em Ambientes Serverless
+## 🐛 Problemas Encontrados e Soluções
 
-**Problema:** O Render (plano gratuito) não inclui Chromium por padrão, fazendo o scraping falhar.
+### 1️⃣ Web Scraping Falha no Render Free Tier
 
-**Solução Implementada:**
-- Em **produção**: Usa `@sparticuz/chromium` (Chromium otimizado para serverless)
-- Em **desenvolvimento**: Usa o Puppeteer normal com Chrome local
+**❌ Problema:**
+O Render (plano gratuito com 512MB RAM) não consegue rodar Puppeteer/Chromium:
+- Chromium precisa de 100-200MB RAM
+- Node.js + Express usa 50-100MB RAM
+- Total: >250MB (quase 50% da RAM disponível)
+- Resultado: Browser nunca inicializa, scrapers retornam vazio
+
+**Tentativas que NÃO funcionaram:**
+- ✗ Usar `@sparticuz/chromium` (versão otimizada)
+- ✗ Usar `puppeteer-core` em vez de `puppeteer`
+- ✗ Adicionar args: `--single-process`, `--disable-dev-shm-usage`
+- ✗ Todos falharam devido à limitação de RAM
+
+**✅ Solução Implementada: Sistema de Cache**
+
+Em vez de fazer scraping em tempo real no servidor, implementamos:
+
+1. **Script local** (`backend/scrape-and-save.js`):
+   - Roda no seu computador (tem RAM suficiente)
+   - Faz scraping das 6 lojas
+   - Salva produtos no Supabase (PostgreSQL na nuvem)
+
+2. **Backend em produção** (`routes/produtos.js`):
+   - Consulta produtos do banco em vez de fazer scraping
+   - Filtra produtos atualizados nos últimos 7 dias
+   - Se banco vazio, usa dados mock como fallback
+
+**Como usar:**
+```bash
+# Executar manualmente quando quiser atualizar
+cd backend
+node scrape-and-save.js "notebook"
+node scrape-and-save.js "telemóvel"
+node scrape-and-save.js "tablet"
+
+# Agendar no Windows (Task Scheduler)
+# Ver instruções em backend/ATUALIZACAO-AUTOMATICA.md
+```
+
+**Vantagens:**
+- ✅ 100% gratuito
+- ✅ Dados reais das lojas
+- ✅ Servidor rápido (só consulta DB)
+- ✅ Pode atualizar quantas vezes quiser
+
+**Desvantagens:**
+- ⚠️ Dados não são em tempo real (atualização manual ou agendada)
+- ⚠️ Precisa rodar script periodicamente
 
 **Configuração no código:**
 ```javascript
@@ -146,27 +191,87 @@ O sistema utiliza **Puppeteer** (Headless Chrome) para fazer scraping em tempo r
 const isProd = process.env.NODE_ENV === 'production';
 
 if (isProd) {
-  // Chromium otimizado para Render/Lambda
-  browser = await puppeteer.launch({
+  // Produção: Chromium otimizado (ainda falha no Render Free)
+  const puppeteerCore = require('puppeteer-core');
+  const chromium = require('@sparticuz/chromium');
+  browser = await puppeteerCore.launch({
     args: chromium.args,
     executablePath: await chromium.executablePath()
   });
 } else {
-  // Puppeteer normal para desenvolvimento
+  // Desenvolvimento: Puppeteer normal (funciona)
+  const puppeteer = require('puppeteer');
   browser = await puppeteer.launch({ headless: true });
 }
 ```
 
-**Dependências necessárias:**
+### 2️⃣ Produtos Duplicados no Banco de Dados
+
+**❌ Problema:**
+Após rodar o script múltiplas vezes, produtos apareciam duplicados:
+- Mesmo produto 13x vezes (exemplo: "ASUS TUF Gaming...")
+- Causa 1: Dados MOCK sendo salvos (id_externo: `mock_chip7_...`)
+- Causa 2: Mesmo nome com IDs externos diferentes
+
+**✅ Solução:**
+
+1. **Remover dados mock do banco:**
 ```bash
-npm install @sparticuz/chromium puppeteer-core
+node backend/limpar-mock.js
+# Removeu 102 produtos mock
 ```
 
-**Alternativas se o scraping continuar lento:**
-- Migrar para plano pago do Render ($7/mês)
-- Usar Railway ou Fly.io (melhor suporte a Puppeteer)
-- Implementar cache de resultados
-- Usar APIs oficiais das lojas (se disponíveis)
+2. **Remover duplicatas por nome:**
+```bash
+node backend/limpar-nomes-duplicados.js
+# Removeu 3.365 duplicatas, mantendo a versão mais recente
+```
+
+3. **Prevenir novos duplicados:**
+```javascript
+// backend/scrape-and-save.js
+// Filtra produtos mock antes de salvar
+const produtosReais = produtos.filter(p => 
+  p.id_externo && !p.id_externo.startsWith('mock_')
+);
+```
+
+4. **Query de busca com DISTINCT:**
+```sql
+-- Backend consulta produtos únicos por nome e loja
+SELECT * FROM produtos 
+WHERE LOWER(nome) LIKE LOWER('%notebook%')
+AND atualizado_em > NOW() - INTERVAL '7 days'
+ORDER BY loja, preco ASC
+```
+
+**Resultado:**
+- ✅ De 4.450 produtos → 983 produtos únicos
+- ✅ Sem duplicatas visuais no frontend
+- ✅ Dados limpos e organizados
+
+### 3️⃣ Scripts de Manutenção
+
+Criados para resolver problemas acima:
+
+```bash
+# Limpar dados mock
+node backend/limpar-mock.js
+
+# Remover duplicatas por id_externo + loja
+node backend/limpar-duplicatas.js
+
+# Remover duplicatas por nome + loja
+node backend/limpar-nomes-duplicados.js
+
+# Verificar duplicatas
+node backend/verificar-duplicatas.js
+
+# Testar conexão com banco
+node backend/test-banco.js
+```
+
+**Documentação completa:** Ver `backend/ATUALIZACAO-AUTOMATICA.md`
 
 ## 📝 Licença
 
