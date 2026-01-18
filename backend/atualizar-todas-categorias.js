@@ -128,22 +128,166 @@ async function atualizarCategorias() {
   console.log('⏰ Horário:', new Date().toLocaleString('pt-PT'));
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
 
-  // Categorias principais de tecnologia
+  // TODAS as categorias de tecnologia e eletrodomésticos
   const categorias = [
+    // Computadores e Portáteis
     'notebook',
     'portátil',
     'computador',
+    'desktop',
+    'all-in-one',
+    
+    // Componentes de PC
+    'processador',
+    'placa gráfica',
+    'RAM',
+    'motherboard',
+    'SSD',
+    'disco rígido',
+    'fonte alimentação',
+    'caixa PC',
+    'cooler',
+    'ventoinha',
+    
+    // Telemóveis e Tablets
     'telemóvel',
     'smartphone',
     'tablet',
+    'ipad',
+    'iphone',
+    'samsung galaxy',
+    
+    // Televisões e Monitores
     'televisão',
+    'TV',
+    'smart TV',
     'monitor',
+    'monitor gaming',
+    'projetor',
+    
+    // Periféricos PC
     'teclado',
     'rato',
-    'impressora',
-    'câmara',
+    'webcam',
+    'microfone',
+    'headset',
     'headphones',
-    'colunas'
+    'auriculares',
+    'colunas',
+    'coluna bluetooth',
+    'soundbar',
+    'pen drive',
+    'hub USB',
+    'adaptador',
+    
+    // Impressoras e Scanners
+    'impressora',
+    'multifunções',
+    'scanner',
+    'tinta impressora',
+    'toner',
+    
+    // Fotografia e Vídeo
+    'câmara',
+    'máquina fotográfica',
+    'câmara vídeo',
+    'gopro',
+    'drone',
+    'gimbal',
+    'tripé',
+    'cartão memória',
+    
+    // Gaming
+    'consola',
+    'playstation',
+    'PS5',
+    'xbox',
+    'nintendo switch',
+    'comando',
+    'joystick',
+    'volante gaming',
+    'cadeira gaming',
+    
+    // Networking
+    'router',
+    'switch',
+    'repetidor wifi',
+    'access point',
+    'powerline',
+    
+    // Smartwatches e Wearables
+    'smartwatch',
+    'smartband',
+    'relógio inteligente',
+    'pulseira atividade',
+    
+    // Acessórios Mobile
+    'powerbank',
+    'carregador',
+    'cabo USB',
+    'capa telemóvel',
+    'película',
+    'suporte carro',
+    
+    // Armazenamento
+    'disco externo',
+    'NAS',
+    'pen USB',
+    'cartão SD',
+    
+    // Áudio
+    'earbuds',
+    'airpods',
+    'coluna portátil',
+    'amplificador',
+    'leitor CD',
+    
+    // Eletrodomésticos Grandes
+    'frigorífico',
+    'máquina lavar roupa',
+    'máquina lavar loiça',
+    'fogão',
+    'forno',
+    'micro-ondas',
+    'exaustor',
+    'arca congeladora',
+    
+    // Climatização
+    'ar condicionado',
+    'aquecedor',
+    'desumidificador',
+    'purificador ar',
+    
+    // Pequenos Eletrodomésticos
+    'aspirador',
+    'robot aspirador',
+    'ferro engomar',
+    'torradeira',
+    'batedeira',
+    'liquidificador',
+    'cafeteira',
+    'chaleira',
+    'fritadeira ar',
+    'processador alimentos',
+    
+    // Casa Inteligente
+    'coluna inteligente',
+    'alexa',
+    'google home',
+    'lâmpada inteligente',
+    'tomada inteligente',
+    'termostato',
+    'fechadura inteligente',
+    'campainha vídeo',
+    'câmara vigilância',
+    
+    // Escritório
+    'cadeira escritório',
+    'secretária',
+    'mesa digitalizadora',
+    'calculadora',
+    'destruidor papel',
+    'plastificadora'
   ];
 
   let totalGeralSalvos = 0;
