@@ -116,16 +116,21 @@ async function atualizarBaseDados(termo = 'notebook') {
       const produtos = dados.produtos || [];
       const nomeLoja = dados.loja || lojaId;
       
-      if (produtos.length > 0) {
-        console.log(`\n📦 ${nomeLoja}: ${produtos.length} produtos`);
-        const { salvos, atualizados } = await salvarProdutos(produtos, nomeLoja);
+      // FILTRAR PRODUTOS MOCK - NÃO SALVAR NO BANCO
+      const produtosReais = produtos.filter(p => 
+        p.id_externo && !p.id_externo.startsWith('mock_')
+      );
+      
+      if (produtosReais.length > 0) {
+        console.log(`\n📦 ${nomeLoja}: ${produtosReais.length} produtos`);
+        const { salvos, atualizados } = await salvarProdutos(produtosReais, nomeLoja);
         console.log(`   ✅ ${salvos} novos | 🔄 ${atualizados} atualizados`);
         
         totalSalvos += salvos;
         totalAtualizados += atualizados;
-        totalProdutos += produtos.length;
+        totalProdutos += produtosReais.length;
       } else {
-        console.log(`\n⚠️  ${nomeLoja}: Nenhum produto encontrado`);
+        console.log(`\n⚠️  ${nomeLoja}: Nenhum produto real encontrado (ignorando mock)`);
       }
     }
 
