@@ -8,8 +8,32 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middlewares
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://tecnocomparador.vercel.app',
+  /^https:\/\/tecnocomparador-.*\.vercel\.app$/ // Permite todos os domínios de preview do Vercel
+];
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: function (origin, callback) {
+    // Permite requests sem origin (como mobile apps ou curl)
+    if (!origin) return callback(null, true);
+    
+    // Verifica se a origin é permitida
+    const isAllowed = allowedOrigins.some(allowedOrigin => {
+      if (typeof allowedOrigin === 'string') {
+        return allowedOrigin === origin;
+      }
+      // Se for regex
+      return allowedOrigin.test(origin);
+    });
+    
+    if (isAllowed) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
 app.use(express.json());
