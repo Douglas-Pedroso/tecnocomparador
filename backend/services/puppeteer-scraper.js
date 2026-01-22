@@ -86,7 +86,7 @@ async function scrapePCBem(termo) {
             const imagemEl = card.querySelector('img');
             const linkEl = card.querySelector('a');
             
-            if (nomeEl && precoEl) {
+            if (nomeEl && precoEl && linkEl?.href) {
               const nome = nomeEl.textContent.trim();
               const precoTexto = precoEl.textContent.trim();
               const precoLimpo = precoTexto
@@ -95,19 +95,22 @@ async function scrapePCBem(termo) {
                 .replace(',', '.');
               const preco = parseFloat(precoLimpo) || 0;
               const imagem = imagemEl?.src || imagemEl?.getAttribute('data-src') || imagemEl?.getAttribute('data-lazy-src');
-              const url = linkEl?.href;
+              const url = linkEl.href;
               
-              if (nome && preco > 0) {
+              // ID único baseado na URL
+              const idUnico = url.split('/').pop() || url.split('?').pop() || `prod_${Math.random().toString(36).substr(2, 9)}`;
+              
+              if (nome && preco > 0 && preco < 20000) {
                 items.push({
                   nome,
                   preco,
                   preco_original: preco * 1.1,
-                  url: url ? (url.startsWith('http') ? url : `https://www.pcbem.pt${url}`) : 'https://www.pcbem.pt',
+                  url: url.startsWith('http') ? url : `https://www.pcbem.pt${url}`,
                   imagem: imagem || 'https://via.placeholder.com/300',
                   loja: 'PCBem',
                   condicao: 'Novo',
                   disponibilidade: 'Disponível',
-                  id_externo: `pcbem_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                  id_externo: `pcbem_${idUnico}`,
                   vendedor: 'PCBem'
                 });
               }
@@ -199,36 +202,36 @@ async function scrapeRadioPopular(termo) {
               nome = nome.replace(/^\d+\s*-\s*/, '').trim();
             }
             
-            const precoElements = card.querySelectorAll('[class*="price"], .price');
-            let precoTexto = '';
-            
-            if (precoElements.length > 0) {
-              precoTexto = precoElements[precoElements.length - 1].textContent.trim();
-            }
-            
             const imagemEl = card.querySelector('img');
-            
-            if (nome && precoTexto) {
-              const precoMatch = precoTexto.match(/[\d\.,]+/);
+            if (nome && url) {
+              // Buscar todos os preços no container e pegar o maior
+              const textoCompleto = card.textContent;
+              const todosPrecos = textoCompleto.match(/(\d+(?:[\s.]\d{3})*,\d+)\s*€/g) || [];
               let preco = 0;
-              if (precoMatch) {
-                const precoStr = precoMatch[0].replace(/\./g, '').replace(',', '.');
-                preco = parseFloat(precoStr);
+              if (todosPrecos.length > 0) {
+                const precosNumericos = todosPrecos.map(p => {
+                  const match = p.match(/(\d+(?:[\s.]\d{3})*,\d+)/);
+                  if (match) {
+                    const precoLimpo = match[1].replace(/[\s.]/g, '').replace(',', '.');
+                    return parseFloat(precoLimpo);
+                  }
+                  return 0;
+                }).filter(p => p > 0 && p < 20000);
+                preco = Math.max(...precosNumericos);
               }
-              
               const imagem = imagemEl?.src || imagemEl?.getAttribute('data-src') || imagemEl?.getAttribute('data-lazy-src');
-              
+              const idUnico = url.split('/').pop() || url.split('?').pop() || `prod_${Math.random().toString(36).substr(2, 9)}`;
               if (preco > 0) {
                 items.push({
                   nome,
                   preco,
                   preco_original: preco * 1.1,
-                  url: url ? (url.startsWith('http') ? url : `https://www.radiopopular.pt${url}`) : null,
+                  url: url.startsWith('http') ? url : `https://www.radiopopular.pt${url}`,
                   imagem: imagem || 'https://via.placeholder.com/300',
                   loja: 'Radio Popular',
                   condicao: 'Novo',
                   disponibilidade: 'Disponível',
-                  id_externo: `radiopopular_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                  id_externo: `radiopopular_${idUnico}`,
                   vendedor: 'Radio Popular'
                 });
               }
@@ -295,10 +298,11 @@ async function scrapeChip7(termo) {
       const produtosEncontrados = [];
       
       // Agrupar elementos por proximidade (produtos ficam próximos)
+      // Procurar por containers maiores que contenham produtos
       todosElementos.forEach(el => {
         const texto = el.textContent;
-        // Verificar se tem preço em formato europeu
-        if (texto && texto.match(/\d+,\d+€/) && el.children.length < 20) {
+        // Verificar se tem preço em formato europeu e tamanho adequado
+        if (texto && texto.match(/\d+[\s.]*\d+,\d+€/) && el.children.length > 2 && el.children.length < 30) {
           produtosEncontrados.push(el);
         }
       });
@@ -326,11 +330,24 @@ async function scrapeChip7(termo) {
             }
           }
           
-          // Buscar preço
-          const precoTexto = produtoEl.textContent.match(/(\d+,\d+)€/);
+          // Buscar TODOS os preços no container e pegar o maior (geralmente o correto)
+          const textoCompleto = produtoEl.textContent;
+          const todosPrecos = textoCompleto.match(/(\d+(?:[\s.]\d{3})*,\d+)\s*€/g) || [];
+          
           let preco = 0;
-          if (precoTexto) {
-            preco = parseFloat(precoTexto[1].replace(',', '.'));
+          if (todosPrecos.length > 0) {
+            // Converter todos os preços e pegar o maior
+            const precosNumericos = todosPrecos.map(p => {
+              const match = p.match(/(\d+(?:[\s.]\d{3})*,\d+)/);
+              if (match) {
+                const precoLimpo = match[1].replace(/[\s.]/g, '').replace(',', '.');
+                return parseFloat(precoLimpo);
+              }
+              return 0;
+            }).filter(p => p > 0 && p < 50000); // Filtrar preços válidos
+            
+            // Pegar o maior preço (geralmente é o preço real, não o desconto)
+            preco = Math.max(...precosNumericos);
           }
           
           // Buscar imagem
@@ -339,17 +356,20 @@ async function scrapeChip7(termo) {
                             produtoEl.parentElement?.parentElement?.querySelector('img');
           const imagem = imgProxima?.src || imgProxima?.getAttribute('data-src');
           
-          if (nome && preco > 0) {
+          if (nome && preco > 0 && url) {
+            // Criar ID único baseado na URL do produto
+            const idUnico = url.split('/').pop() || url.split('?').pop() || `prod_${Math.random().toString(36).substr(2, 9)}`;
+            
             items.push({
               nome,
               preco,
               preco_original: preco * 1.1,
-              url: url ? (url.startsWith('http') ? url : `https://chip7.pt${url}`) : null,
+              url: url.startsWith('http') ? url : `https://chip7.pt${url}`,
               imagem: imagem || 'https://via.placeholder.com/300',
               loja: 'Chip7',
               condicao: 'Novo',
               disponibilidade: 'Disponível',
-              id_externo: `chip7_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+              id_externo: `chip7_${idUnico}`,
               vendedor: 'Chip7'
             });
           }
@@ -358,11 +378,11 @@ async function scrapeChip7(termo) {
         }
       });
       
-      // Remover duplicados (mesmo nome e preço)
+      // Remover duplicados (mesmo id_externo, nome e preço)
       const unicos = [];
       const vistos = new Set();
       items.forEach(item => {
-        const chave = `${item.nome}_${item.preco}`;
+        const chave = `${item.id_externo}_${item.nome}_${item.preco}`;
         if (!vistos.has(chave)) {
           vistos.add(chave);
           unicos.push(item);
@@ -432,16 +452,26 @@ async function scrapePCDiga(termo) {
             if (!container) return;
             
             const textoContainer = container.textContent;
-            const precoMatch = textoContainer.match(/(\d+[.,]\d+)\s*€/);
-            
-            if (precoMatch) {
-              const precoTexto = precoMatch[1].replace('.', '').replace(',', '.');
-              const preco = parseFloat(precoTexto);
-              
-              // Buscar imagem próxima
-              const img = container.querySelector('img');
-              const imagem = img?.src || img?.getAttribute('data-src') || 'https://via.placeholder.com/300';
-              
+            // Buscar todos os preços no container e pegar o maior
+            const todosPrecos = textoContainer.match(/(\d+(?:[\s.]\d{3})*,\d+)\s*€/g) || [];
+            let preco = 0;
+            if (todosPrecos.length > 0) {
+              const precosNumericos = todosPrecos.map(p => {
+                const match = p.match(/(\d+(?:[\s.]\d{3})*,\d+)/);
+                if (match) {
+                  const precoLimpo = match[1].replace(/[\s.]/g, '').replace(',', '.');
+                  return parseFloat(precoLimpo);
+                }
+                return 0;
+              }).filter(p => p > 0 && p < 100000);
+              preco = Math.max(...precosNumericos);
+            }
+            // Buscar imagem próxima
+            const img = container.querySelector('img');
+            const imagem = img?.src || img?.getAttribute('data-src') || 'https://via.placeholder.com/300';
+            // ID único baseado na URL
+            const idUnico = url.split('/').pop() || url.split('?').pop() || `prod_${Math.random().toString(36).substr(2, 9)}`;
+            if (preco > 0 && preco < 100000) {
               items.push({
                 nome,
                 preco,
@@ -451,7 +481,7 @@ async function scrapePCDiga(termo) {
                 loja: 'PCDiga',
                 condicao: 'Novo',
                 disponibilidade: 'Disponível',
-                id_externo: `pcdiga_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                id_externo: `pcdiga_${idUnico}`,
                 vendedor: 'PCDiga'
               });
             }
@@ -540,18 +570,27 @@ async function scrapeGlobalData(termo) {
             
             if (!linkProduto) return;
             
-            // Buscar preço
+            // Buscar todos os preços no container e pegar o maior
             const textoArticle = article.textContent;
-            const precoMatch = textoArticle.match(/(\d[\d\s.,]+)\s*€/);
-            if (!precoMatch) return;
-            
-            const precoTexto = precoMatch[1].replace(/\s/g, '').replace('.', '').replace(',', '.');
-            const preco = parseFloat(precoTexto);
-            
+            const todosPrecos = textoArticle.match(/(\d+(?:[\s.]\d{3})*,\d+)\s*€/g) || [];
+            let preco = 0;
+            if (todosPrecos.length > 0) {
+              const precosNumericos = todosPrecos.map(p => {
+                const match = p.match(/(\d+(?:[\s.]\d{3})*,\d+)/);
+                if (match) {
+                  const precoLimpo = match[1].replace(/[\s.]/g, '').replace(',', '.');
+                  return parseFloat(precoLimpo);
+                }
+                return 0;
+              }).filter(p => p > 0 && p < 50000);
+              preco = Math.max(...precosNumericos);
+            }
+            if (preco <= 0 || preco > 50000) return;
             // Buscar imagem
             const img = article.querySelector('img');
             const imagem = img?.src || 'https://via.placeholder.com/300';
-            
+            // ID único baseado na URL
+            const idUnico = linkProduto.href.split('/').pop() || linkProduto.href.split('?').pop() || `prod_${Math.random().toString(36).substr(2, 9)}`;
             items.push({
               nome: linkProduto.textContent.trim(),
               preco,
@@ -561,7 +600,7 @@ async function scrapeGlobalData(termo) {
               loja: 'GlobalData',
               condicao: 'Novo',
               disponibilidade: 'Disponível',
-              id_externo: `globaldata_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+              id_externo: `globaldata_${idUnico}`,
               vendedor: 'GlobalData'
             });
           } catch (err) {
@@ -638,28 +677,39 @@ async function scrapeWorten(termo) {
             const imagemEl = card.querySelector('img');
             const linkEl = card.querySelector('a');
             
-            if (nomeEl && precoEl) {
+            if (nomeEl && precoEl && linkEl?.href) {
               const nome = nomeEl.textContent.trim();
               const precoTexto = precoEl.textContent.trim();
-              const precoLimpo = precoTexto
-                .replace(/[^\d,]/g, '')
-                .replace(/\./g, '')
-                .replace(',', '.');
-              const preco = parseFloat(precoLimpo) || 0;
+              // Buscar todos os preços no container e pegar o maior
+              const textoCompleto = precoEl.parentElement?.textContent || precoTexto;
+              const todosPrecos = textoCompleto.match(/(\d+(?:[\s.]\d{3})*,\d+)\s*€/g) || [];
+              let preco = 0;
+              if (todosPrecos.length > 0) {
+                const precosNumericos = todosPrecos.map(p => {
+                  const match = p.match(/(\d+(?:[\s.]\d{3})*,\d+)/);
+                  if (match) {
+                    const precoLimpo = match[1].replace(/[\s.]/g, '').replace(',', '.');
+                    return parseFloat(precoLimpo);
+                  }
+                  return 0;
+                }).filter(p => p > 0 && p < 20000);
+                preco = Math.max(...precosNumericos);
+              }
               const imagem = imagemEl?.src || imagemEl?.getAttribute('data-src') || imagemEl?.getAttribute('data-lazy-src');
-              const url = linkEl?.href;
-              
-              if (nome && preco > 0) {
+              const url = linkEl.href;
+              // ID único baseado na URL
+              const idUnico = url.split('/').pop() || url.split('?').pop() || `prod_${Math.random().toString(36).substr(2, 9)}`;
+              if (nome && preco > 0 && preco < 20000) {
                 items.push({
                   nome,
                   preco,
                   preco_original: preco * 1.1,
-                  url: url ? (url.startsWith('http') ? url : `https://www.worten.pt${url}`) : 'https://www.worten.pt',
+                  url: url.startsWith('http') ? url : `https://www.worten.pt${url}`,
                   imagem: imagem || 'https://via.placeholder.com/300',
                   loja: 'Worten',
                   condicao: 'Novo',
                   disponibilidade: 'Disponível',
-                  id_externo: `worten_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                  id_externo: `worten_${idUnico}`,
                   vendedor: 'Worten'
                 });
               }
