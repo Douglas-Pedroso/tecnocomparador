@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaGoogle, FaFacebook, FaEnvelope, FaLock } from 'react-icons/fa';
+import { FaGoogle, FaEnvelope, FaLock } from 'react-icons/fa';
 import { AuthContext } from '../context/AuthContext';
 import { authAPI } from '../services/api';
 import './Login.css';
@@ -31,12 +31,8 @@ function Login() {
     }
   };
 
-  const handleOAuthLogin = (provider) => {
-    if (provider === 'google') {
-      window.location.href = authAPI.googleLogin();
-    } else if (provider === 'facebook') {
-      window.location.href = authAPI.facebookLogin();
-    }
+  const handleOAuthLogin = () => {
+    window.location.href = authAPI.googleLogin();
   };
 
   return (
@@ -96,20 +92,12 @@ function Login() {
 
           <div className="oauth-buttons">
             <button 
-              onClick={() => handleOAuthLogin('google')}
+              onClick={handleOAuthLogin}
               className="btn-oauth btn-google"
               disabled={loading}
             >
               <FaGoogle />
               <span>Google</span>
-            </button>
-            <button 
-              onClick={() => handleOAuthLogin('facebook')}
-              className="btn-oauth btn-facebook"
-              disabled={loading}
-            >
-              <FaFacebook />
-              <span>Facebook</span>
             </button>
           </div>
 

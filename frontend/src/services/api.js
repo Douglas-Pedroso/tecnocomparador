@@ -42,8 +42,7 @@ export const authAPI = {
   register: (dados) => api.post('/api/auth/register', dados),
   login: (dados) => api.post('/api/auth/login', dados),
   me: () => api.get('/api/auth/me'),
-  googleLogin: () => `${API_URL}/api/auth/google`,
-  facebookLogin: () => `${API_URL}/api/auth/facebook`
+  googleLogin: () => `${API_URL}/api/auth/google`
 };
 
 // Funções de produtos

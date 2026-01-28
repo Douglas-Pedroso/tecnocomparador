@@ -150,20 +150,5 @@ router.get('/google/callback',
   }
 );
 
-// GET /api/auth/facebook - Iniciar OAuth Facebook
-router.get('/facebook',
-  passport.authenticate('facebook', { scope: ['email'] })
-);
-
-// GET /api/auth/facebook/callback - Callback OAuth Facebook
-router.get('/facebook/callback',
-  passport.authenticate('facebook', { 
-    failureRedirect: `${process.env.FRONTEND_URL}/login?error=facebook` 
-  }),
-  (req, res) => {
-    const token = gerarToken(req.user);
-    res.redirect(`${process.env.FRONTEND_URL}/?token=${token}`);
-  }
-);
 
 module.exports = router;
